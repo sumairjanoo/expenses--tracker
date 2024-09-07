@@ -1,0 +1,53 @@
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Initialize an empty DataFrame for transactions
+columns = ['Date', 'Category', 'Description', 'Amount', 'Type']
+transactions = pd.DataFrame(columns=columns)
+
+def add_transaction(date, category, description, amount, trans_type):
+    global transactions
+    new_transaction = pd.DataFrame([[date, category, description, amount, trans_type]], columns=columns)
+    transactions = pd.concat([transactions, new_transaction], ignore_index=True)
+
+def generate_report():
+    global transactions
+    print("Financial Report:")
+    print(transactions.groupby(['Category', 'Type'])['Amount'].sum())
+
+def plot_expenses_vs_income():
+    global transactions
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=transactions, x='Category', y='Amount', hue='Type', palette='viridis')
+    plt.title('Expenses vs Income by Category')
+    plt.xlabel('Category')
+    plt.ylabel('Amount')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+def set_spending_limit(category, limit):
+    global transactions
+    total_spent = transactions[transactions['Category'] == category]['Amount'].sum()
+    print(f"Total spent in {category}: ${total_spent:.2f}")
+    if total_spent > limit:
+        print(f"Warning: You have exceeded the spending limit of ${limit:.2f} for {category}.")
+    else:
+        print(f"Spending in {category} is within the limit.")
+
+# Example Usage
+# Add some transactions
+add_transaction('2024-09-01', 'Groceries', 'Weekly grocery shopping', 200, 'Expense')
+add_transaction('2024-09-02', 'Salary', 'Monthly salary', 2000, 'Income')
+add_transaction('2024-09-03', 'Utilities', 'Electric bill', -100, 'Expense')
+
+# Generate financial report
+generate_report()
+
+# Plot expenses vs income
+plot_expenses_vs_income()
+
+# Set spending limit
+set_spending_limit('Groceries', 100)
